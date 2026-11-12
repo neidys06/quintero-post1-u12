@@ -1,0 +1,29 @@
+# Prueba local del perfil prod con PostgreSQL (equivale a lo que hará Railway/Render).
+# Uso:  docker compose up --build    → http://localhost:8080/actuator/health
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: appdb
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: apppass
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U appuser -d appdb"]
+      interval: 3s
+      retries: 10
+  app:
+    build: .
+    image: mi-spring-app:local
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DATASOURCE_URL: jdbc:postgresql://db:5432/appdb
+      DATASOURCE_USER: appuser
+      DATASOURCE_PASSWORD: apppass
+      DDL_AUTO: update   # base nueva: crea las tablas la primera vez
+    ports:
+      - "8080:8080"
