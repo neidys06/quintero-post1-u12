@@ -91,10 +91,10 @@ en `prod` solo `health` e `info` (`/actuator/beans` responde 404).
    `DATASOURCE_PASSWORD=${{Postgres.PGPASSWORD}}` y, solo en el primer
    despliegue, `DDL_AUTO=update` (luego se elimina para volver a `validate`).
 4. **Settings → Networking → Generate Domain**.
-5. Verificar `https://<dominio>.up.railway.app/actuator/health` → `{"status":"UP"}`.
+5. Verificar `https://quintero-post1-u12-production.up.railway.app/actuator/health` → `{"status":"UP"}`.
 
-URL de la aplicación: `https://<dominio>.up.railway.app` (reemplazar por la
-URL real generada) — `/actuator/health` y `/api/productos?categoria=ELECTRONICA`.
+URL de la aplicación: https://quintero-post1-u12-production.up.railway.app
+— `/actuator/health` y `/api/productos?categoria=ELECTRONICA`.
 
 ## Decisiones de diseño
 
