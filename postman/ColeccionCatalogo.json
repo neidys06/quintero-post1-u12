@@ -1,0 +1,177 @@
+{
+  "info": {
+    "name": "API Catálogo de Productos",
+    "description": "Pruebas de extremo a extremo de la API del catálogo (U10). Ejecutar en orden con la aplicación corriendo.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. POST crear producto (201)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 201 Created\", () => {",
+              " pm.response.to.have.status(201);",
+              "});",
+              "pm.test(\"Respuesta contiene id numérico\", () => {",
+              " const b = pm.response.json();",
+              " pm.expect(b).to.have.property(\"id\");",
+              " pm.expect(b.id).to.be.a(\"number\");",
+              " pm.collectionVariables.set(\"productoId\", b.id);",
+              "});",
+              "pm.test(\"Tiempo de respuesta < 500ms\", () => {",
+              " pm.expect(pm.response.responseTime).to.be.below(500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Teclado mecánico\",\n  \"precio\": 120.0,\n  \"categoria\": \"ELECTRONICA\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/productos",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "productos"
+          ]
+        }
+      }
+    },
+    {
+      "name": "2. GET obtener producto creado (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200 OK\", () => {",
+              " pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"El nombre coincide con el creado\", () => {",
+              " pm.expect(pm.response.json().nombre).to.eql(\"Teclado mecánico\");",
+              "});",
+              "pm.test(\"El id coincide con el guardado en la colección\", () => {",
+              " pm.expect(pm.response.json().id).to.eql(pm.collectionVariables.get(\"productoId\"));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/productos/{{productoId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "productos",
+            "{{productoId}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "3. GET listar por categoría ELECTRONICA (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200 OK\", () => {",
+              " pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Devuelve un arreglo con al menos un producto\", () => {",
+              " const lista = pm.response.json();",
+              " pm.expect(lista).to.be.an(\"array\").that.is.not.empty;",
+              "});",
+              "pm.test(\"Todos los productos son de la categoría ELECTRONICA\", () => {",
+              " pm.response.json().forEach(p => pm.expect(p.categoria).to.eql(\"ELECTRONICA\"));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/productos?categoria=ELECTRONICA",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "productos"
+          ],
+          "query": [
+            {
+              "key": "categoria",
+              "value": "ELECTRONICA"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "4. GET producto inexistente (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 404 Not Found\", () => {",
+              " pm.response.to.have.status(404);",
+              "});",
+              "pm.test(\"El cuerpo explica que no se encontró\", () => {",
+              " pm.expect(pm.response.text()).to.include(\"no encontrado\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/productos/99999",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "productos",
+            "99999"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "productoId",
+      "value": ""
+    }
+  ]
+}
